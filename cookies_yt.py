@@ -14,8 +14,8 @@ driver.get("https://orteil.dashnet.org/cookieclicker/")
 time.sleep(4)
 #    if driver.find_element(By.ID, "langSelectButton"):
 WebDriverWait(driver, 5).until(
-            EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'English')]"))
-        )
+    EC.presence_of_element_located((By.XPATH, "//*[contains(text(), 'English')]"))
+)
 input_language = driver.find_element(By.XPATH, "//*[contains(text(), 'English')]")
 
 

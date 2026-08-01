@@ -17,13 +17,11 @@ try:
     cookie_button.click()
 except Exception as e:
     print("No Cokkie button found")
-#app_logo_button = driver.find_element(By.XPATH, "//a[@aria-label='Monkeytype Home']")
-#app_logo_button.click()
+# app_logo_button = driver.find_element(By.XPATH, "//a[@aria-label='Monkeytype Home']")
+# app_logo_button.click()
 
 wait = WebDriverWait(driver, 5)
-wait.until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, ".word.active"))
-        )
+wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".word.active")))
 while True:
     try:
         current_word = driver.find_element(By.CSS_SELECTOR, ".word.active")
@@ -34,7 +32,7 @@ while True:
             each_word = current_word.text
         driver.switch_to.active_element.send_keys(each_word + Keys.SPACE)
         time.sleep(0.07)
-    except Exception :
+    except Exception:
         print("Code execution finished")
         break
 time.sleep(10)

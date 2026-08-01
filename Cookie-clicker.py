@@ -13,12 +13,12 @@ driver = webdriver.Chrome(service=service)
 driver.get("https://orteil.dashnet.org/cookieclicker/")
 time.sleep(4)
 if driver.find_elements(By.ID, "promptContentChangeLanguage"):
-#    if driver.find_element(By.ID, "langSelectButton"):
-        WebDriverWait(driver, 5).until(
-            EC.presence_of_element_located((By.ID, "langSelect-EN"))
-        )
-        input_language = driver.find_element(By.ID, "langSelect-EN")
+    #    if driver.find_element(By.ID, "langSelectButton"):
+    WebDriverWait(driver, 5).until(
+        EC.presence_of_element_located((By.ID, "langSelect-EN"))
+    )
+    input_language = driver.find_element(By.ID, "langSelect-EN")
 
-        input_language.click()
+    input_language.click()
 time.sleep(120)
 driver.quit()

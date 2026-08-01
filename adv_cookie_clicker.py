@@ -21,8 +21,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # ---------- Configuration ----------
-CHROMEDRIVER_PATH = "/usr/bin/chromedriver"   # change if needed
-CHROME_PROFILE_DIR = "/tmp/selenium_profile_cookieclicker"  # optional persistent profile
+CHROMEDRIVER_PATH = "/usr/bin/chromedriver"  # change if needed
+CHROME_PROFILE_DIR = (
+    "/tmp/selenium_profile_cookieclicker"  # optional persistent profile
+)
 COOKIES_FILE = "cookies_cookieclicker.json"
 LOCAL_STORAGE_FILE = "local_storage_cookieclicker.json"
 PAGE_URL = "https://orteil.dashnet.org/cookieclicker/"
@@ -30,8 +32,13 @@ HUMAN_TIMEOUT_SECONDS = 300  # time allowed for human to solve challenge
 CLICK_COUNT = 2000
 CLICK_INTERVAL = 0.01  # seconds between clicks
 
+
 # ---------- Browser helpers ----------
-def start_browser(chromedriver_path: str = CHROMEDRIVER_PATH, user_data_dir: Optional[str] = None, headless: bool = False):
+def start_browser(
+    chromedriver_path: str = CHROMEDRIVER_PATH,
+    user_data_dir: Optional[str] = None,
+    headless: bool = False,
+):
     options = webdriver.ChromeOptions()
     if user_data_dir:
         options.add_argument(f"--user-data-dir={user_data_dir}")
@@ -42,7 +49,12 @@ def start_browser(chromedriver_path: str = CHROMEDRIVER_PATH, user_data_dir: Opt
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
-def save_cookies_and_local_storage(driver, cookies_path: str = COOKIES_FILE, local_storage_path: str = LOCAL_STORAGE_FILE):
+
+def save_cookies_and_local_storage(
+    driver,
+    cookies_path: str = COOKIES_FILE,
+    local_storage_path: str = LOCAL_STORAGE_FILE,
+):
     cookies = driver.get_cookies()
     with open(cookies_path, "w") as f:
         json.dump(cookies, f)
@@ -52,7 +64,12 @@ def save_cookies_and_local_storage(driver, cookies_path: str = COOKIES_FILE, loc
     with open(local_storage_path, "w") as f:
         json.dump(local_storage, f)
 
-def load_cookies_and_local_storage(driver, cookies_path: str = COOKIES_FILE, local_storage_path: str = LOCAL_STORAGE_FILE):
+
+def load_cookies_and_local_storage(
+    driver,
+    cookies_path: str = COOKIES_FILE,
+    local_storage_path: str = LOCAL_STORAGE_FILE,
+):
     if os.path.exists(cookies_path):
         with open(cookies_path, "r") as f:
             cookies = json.load(f)
@@ -67,11 +84,18 @@ def load_cookies_and_local_storage(driver, cookies_path: str = COOKIES_FILE, loc
         with open(local_storage_path, "r") as f:
             local_storage = json.load(f)
         for k, v in local_storage.items():
-            driver.execute_script("window.localStorage.setItem(arguments[0], arguments[1]);", k, v)
+            driver.execute_script(
+                "window.localStorage.setItem(arguments[0], arguments[1]);", k, v
+            )
+
 
 # ---------- Human validation ----------
-def human_validate_and_save(url: str = PAGE_URL, timeout_seconds: int = HUMAN_TIMEOUT_SECONDS):
-    print("Opening visible browser. Please complete any Cloudflare challenge in the opened window.")
+def human_validate_and_save(
+    url: str = PAGE_URL, timeout_seconds: int = HUMAN_TIMEOUT_SECONDS
+):
+    print(
+        "Opening visible browser. Please complete any Cloudflare challenge in the opened window."
+    )
     driver = start_browser(user_data_dir=CHROME_PROFILE_DIR, headless=False)
     try:
         driver.get(url)
@@ -84,16 +108,25 @@ def human_validate_and_save(url: str = PAGE_URL, timeout_seconds: int = HUMAN_TI
             except Exception:
                 ready = ""
             title = driver.title or ""
-            if ready == "complete" and ("Cookie Clicker" in title or "cookie clicker" in title.lower()):
+            if ready == "complete" and (
+                "Cookie Clicker" in title or "cookie clicker" in title.lower()
+            ):
                 time.sleep(2)
                 break
         save_cookies_and_local_storage(driver)
-        print(f"Saved cookies to {COOKIES_FILE} and local storage to {LOCAL_STORAGE_FILE}.")
+        print(
+            f"Saved cookies to {COOKIES_FILE} and local storage to {LOCAL_STORAGE_FILE}."
+        )
     finally:
         driver.quit()
 
+
 # ---------- Cookie Clicker automation ----------
-def run_cookieclicker_bot(use_saved_session: bool = True, clicks: int = CLICK_COUNT, click_interval: float = CLICK_INTERVAL):
+def run_cookieclicker_bot(
+    use_saved_session: bool = True,
+    clicks: int = CLICK_COUNT,
+    click_interval: float = CLICK_INTERVAL,
+):
     driver = start_browser(user_data_dir=CHROME_PROFILE_DIR, headless=False)
     try:
         driver.get(PAGE_URL)
@@ -105,7 +138,9 @@ def run_cookieclicker_bot(use_saved_session: bool = True, clicks: int = CLICK_CO
 
         try:
             if driver.find_elements(By.ID, "promptContentChangeLanguage"):
-                en_btn = wait.until(EC.element_to_be_clickable((By.ID, "langSelect-EN")))
+                en_btn = wait.until(
+                    EC.element_to_be_clickable((By.ID, "langSelect-EN"))
+                )
                 try:
                     en_btn.click()
                 except Exception:
@@ -115,7 +150,9 @@ def run_cookieclicker_bot(use_saved_session: bool = True, clicks: int = CLICK_CO
             print("Language selection skipped or failed:", e)
 
         try:
-            big_cookie = wait.until(EC.presence_of_element_located((By.ID, "bigCookie")))
+            big_cookie = wait.until(
+                EC.presence_of_element_located((By.ID, "bigCookie"))
+            )
         except Exception as e:
             print("bigCookie not found:", e)
             return
@@ -136,6 +173,7 @@ def run_cookieclicker_bot(use_saved_session: bool = True, clicks: int = CLICK_CO
         time.sleep(10)
     finally:
         driver.quit()
+
 
 # ---------- Session expiry detection ----------
 def saved_session_valid() -> bool:
@@ -158,6 +196,7 @@ def saved_session_valid() -> bool:
         except Exception:
             pass
 
+
 # ---------- Orchestration ----------
 def main():
     if not saved_session_valid():
@@ -168,6 +207,6 @@ def main():
 
     run_cookieclicker_bot(use_saved_session=True, clicks=2000, click_interval=0.01)
 
+
 if __name__ == "__main__":
     main()
-

@@ -7,11 +7,7 @@ from time import sleep
 import os
 
 
-if not os.path.exists("Products/amazon"):
-    os.makedirs("Products/amazon", exist_ok=True)
 
-if not os.path.exists("Products/flipkart"):
-    os.makedirs("Products/flipkart", exist_ok=True)
 Product = "laptop"
 
 with open(f"Carts-{Product}.txt", "w", encoding="utf-8") as file:
